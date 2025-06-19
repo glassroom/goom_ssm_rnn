@@ -1,10 +1,15 @@
 # goom_ssm_rnn
 
-TODO: Write a brief introduction to the RNN.
+We formulate, implement, and successfully train and test on several tasks a deep recurrent neural network (RNN) whose layers capture sequential dependencies with a non-diagonal state-space model (SSM), computed over GOOMs, executable in parallel via a prefix scan, allowing recurrent state magnitudes to fluctuate freely over time steps. Recurrent states are computed over GOOMs, so the can fluctuate freely over a greater dynamic range of real values than previously possible.
 
-## Installation
 
-TODO
+## Installing
+
+1. Clone this repository.
+
+2. Install the dependencies in `requirements.txt`.
+
+3. There is no third step.
 
 
 ## Instantiating the Model
