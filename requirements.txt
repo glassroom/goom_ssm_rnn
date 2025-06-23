@@ -1,5 +1,6 @@
 tqdm
 numpy
 torch
+tiktoken
 git+https://github.com/glassroom/generalized_orders_of_magnitude
 git+https://github.com/glassroom/torch_parallel_scan
