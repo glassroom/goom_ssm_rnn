@@ -55,7 +55,7 @@ class LogMultiDenseExp(nn.Module):
         return updated_log_A2_atop_B2
 
 
-class LTIoverGOOMs(nn.Module):
+class SSMoverGOOMs(nn.Module):
     """
     Computes the linear-time-invariant non-diagonal state-space system
 
@@ -127,7 +127,7 @@ class LTIoverGOOMs(nn.Module):
 class ResidualRecurrentLayer(nn.Module):    
     """
     Update each token with information from its preceding tokens, in parallel,
-    modeling sequential dependencies with the module `LTIoverGOOMs`.
+    capturing sequential dependencies with the module `SSMoverGOOMs`.
 
     Args:
         d_emb: number of embedding features per step
@@ -144,17 +144,17 @@ class ResidualRecurrentLayer(nn.Module):
         super().__init__()
         self.d_emb, self.n_hid, self.d_hid = (d_emb, n_hid, d_hid)
         self.lnorm = nn.LayerNorm(d_emb)
-        self.lti_over_gooms = LTIoverGOOMs(d_emb, d_emb * 2, n_hid, d_hid)
+        self.ssm_over_gooms = SSMoverGOOMs(d_emb, d_emb * 2, n_hid, d_hid)
         self.feedfwd = nn.Sequential(nn.GLU(dim=-1), nn.Linear(d_emb, d_emb, bias=False))
 
     def forward(self, inp, continue_prev=False):
         x = self.lnorm(inp)                        # [..., seq_len, d_emb]
-        x = self.lti_over_gooms(x, continue_prev)  # [..., seq_len, d_emb * 2]
+        x = self.ssm_over_gooms(x, continue_prev)  # [..., seq_len, d_emb * 2]
         res = self.feedfwd(x)                      # [..., seq_len, d_emb]
         return inp + res
 
 
-class ModelClass(nn.Module):
+class GenerativeRNN(nn.Module):
     """
     Given a sequence of token ids, generate the next token id.
 
@@ -193,7 +193,7 @@ class ModelClass(nn.Module):
 
     def get_param_groups(self, weight_decay):
         "Given a weight decay, returns two parameter groups for training."
-        decay_attrs = { nn.Embedding: ['weight'], nn.Linear: ['weight'], LTIoverGOOMs: ['init_states', 'A', 'B', 'C', 'D'], }
+        decay_attrs = { nn.Embedding: ['weight'], nn.Linear: ['weight'], SSMoverGOOMs: ['init_states', 'A', 'B', 'C', 'D'], }
         decay_modules = set(m for m in self.modules() if type(m) in decay_attrs.keys())
         decay_ids = set(id(getattr(m, attr)) for m in decay_modules for attr in decay_attrs[type(m)])
         return [
