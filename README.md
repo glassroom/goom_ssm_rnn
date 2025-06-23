@@ -27,7 +27,8 @@ DEVICE = 'cuda'  # change as needed
 enc = tiktoken.get_encoding('gpt2')
 
 # Instantiate an RNN for generative language model with GPT-2 token ids:
-model = goom_ssm_rnn.GenerativeRNN(vocab_sz=enc.n_vocab, d_emb=512, n_hid=16, d_hid=32, n_res=8)
+model = goom_ssm_rnn.GenerativeRNN(
+    vocab_sz=enc.n_vocab, d_emb=512, n_hid=16, d_hid=32, n_res=8)
 
 # Move model to cuda device:
 model.to(device=DEVICE)
@@ -35,7 +36,14 @@ model.to(device=DEVICE)
 # You must provide the training code.
 ```
 
-The RNN model is implemented as a standard PyTorch module that you can train and test on any task, using conventional techniques, including autocasting, as with any other PyTorch module. However, the model can be only partially compiled, because at present PyTorch's compiler does not yet fully support complex-typed tensors. The recurrent layers capture sequential dependencies with an SSM over GOOMs, which are represented by torch.complex64 tensors. As we explain in our paper, the GOOMs computed by each recurrent layer can fluctuate freely over a dynamic range of values that is not representable by torch.float32 or torch.float64, requiring that we scale the GOOMs before exponentiating them to real values represented by float tensors.
+The RNN model is implemented as a standard PyTorch module that you can train and test on any task, using conventional techniques, including autocasting, as with any other PyTorch module.
+
+However, the model can be only partially compiled, because at present PyTorch's compiler does not yet fully support complex-typed tensors. The recurrent layers capture sequential dependencies with an SSM over GOOMs, which are represented by torch.complex64 tensors.
+
+As we explain in our paper, the GOOMs computed by each recurrent layer can fluctuate freely over a dynamic range of values that is not representable by torch.float32 or torch.float64, so each recurrent layer scales the GOOMs before exponentiating them to real values represented by float tensors.
+
+
+## Convenience Methods
 
 Besides the standard PyTorch `forward()` method, the model provides three nice-to-have methods, for convenience:
 
@@ -48,7 +56,11 @@ Besides the standard PyTorch `forward()` method, the model provides three nice-t
 
 ## Modifying the RNN for Other Tasks
 
-You can modify or replace the model's embedding layer and/or head, as needed, for tasks other than generative language model. All model components are defined in a single file, [goom_ssm_rrn.py](goom_ssm_rrn.py), for your convenience.
+You can modify or replace the model's embedding layer and/or head, as needed, for tasks other than generative language model.
+
+All model components are defined in a single file:
+
+[goom_ssm_rrn.py](goom_ssm_rrn.py)
 
 
 ## Training the RNN
