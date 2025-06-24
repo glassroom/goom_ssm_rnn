@@ -60,8 +60,8 @@ For all tasks, we instantiated the model with 512 embedding dimensions (`d_emb=5
 | Maximum momentum       | 0.99                                                         |
 | Minimum momentum       | 0.85                                                         |
 | Warm-up period         | 10 batches (10,000 samples)                                  |
-| Compilation            | Yes (applies only to float tensors, not GOOMs)               |
-| Autocasting            | Yes, to torch.float16 (only float tensors, not GOOMs)        |
+| Compilation            | Yes (applies only to operations on float tensors, not GOOMs) |
+| Autocasting            | Yes, to `torch.float16` (only float tensors, not GOOMs)      |
 | Number of epochs       | Varies by task                                               |
 
 The model, in all variants we tried, trains to competitive performance on all toy tasks we tested.
