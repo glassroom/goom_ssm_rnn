@@ -41,9 +41,9 @@ We have implemented the model as a standard PyTorch `nn.Module` that you can tra
 The recurrent layers in the model capture sequential dependencies with an SSM over GOOMs, which are represented as torch.complex64 tensors. As we explain in our paper, the model's use of complex-typed GOOMs makes it possible for recurrent states in each layer to fluctuate freely over a greater dynamic range of values that would be possible with torch.float32 or torch.float64, without numerical degradation. Each recurrent layer scales GOOMs before exponentiating them to real values represented by float tensors.
 
 
-## Training the RNN
+## Replicating Published Results
 
-We successfully trained this RNN model, and variants of it, on several toy tasks, including Wikitext-103 (using the GPT-2 vocabulary), Sequential MNIST generation (using a vocabulary size of 256 gray levels per pixel-token), and Sequential MNIST classification (replacing the language modeling head with a linear classification head that predicts 10 classes from the last pixel-token hidden state), and simple Copy Memory tasks.
+We successfully trained this RNN model, and variants of it, on several toy tasks, including [Wikitext-103](https://huggingface.co/datasets/Salesforce/wikitext) (using the GPT-2 vocabulary), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) generation (unrolling the images into sequences of 784 pixel-tokens, and using a vocabulary size of 256 gray levels per pixel-token), and Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) classification (replacing the generative-language-modeling head with a linear classification head that predicts 10 classes from the last pixel-token hidden state), and simple Copy Memory tasks.
 
 For all tasks, we instantiated the model with 512 embedding dimensions (`d_emb=512`), 16 heads per token (`n_hid=16`), 32 features per head (`d_hid=32`), and eight residual recurrent layers (`n_res=8`), resulting in 13M to 38M parameters, and trained it on a recent mid-tier Nvidia GPU, with the following hyper-parameters:
 
@@ -66,7 +66,7 @@ For all tasks, we instantiated the model with 512 embedding dimensions (`d_emb=5
 
 The model, in all variants we tried, trains to competitive performance on all toy tasks we tested.
 
-Out of curiosity, we also partially trained a larger RNN (`d_emb=768`, `n_hid=24`, `d_hid=32`, `n_res=24`; 124M parameters) on approximately 10B tokens randomly sampled from The Pile, with a sequence length of 1024 tokens, using the GPT-2 vocabulary, and saw cross-entropy loss decline to approximately 2.7. State-of-the-art cross-entropy for models of comparable size, trained on at least 30x more tokens from better datasets, is approximately 2.4. This partial experiment suggests our RNN model can be scaled up to non-toy tasks.
+Out of curiosity, we also partially trained a larger RNN (`d_emb=768`, `n_hid=24`, `d_hid=32`, `n_res=24`; 124M parameters) on approximately 10B tokens randomly sampled from [The Pile](https://huggingface.co/datasets/monology/pile-uncopyrighted), with a sequence length of 1024 tokens, using the GPT-2 vocabulary, and saw cross-entropy loss decline to approximately 2.7. State-of-the-art cross-entropy for models of comparable size, trained on at least 30x more tokens from better datasets, is approximately 2.4. This partial experiment suggests our RNN model can be scaled up to non-toy tasks.
 
 
 ## Convenience Methods
@@ -82,7 +82,7 @@ Besides the standard PyTorch `forward()` method, the model provides three additi
 
 ## Modifying the RNN for Other Tasks
 
-You can modify or replace the model's embedding layer and/or head, as needed, for tasks other than generative language model. All model components are defined in a single file:
+You can modify or replace the model's language-modeling head, as needed, for tasks other than generative language modeling. All model components are defined in a single file:
 
 [goom_ssm_rnn.py](goom_ssm_rnn.py)
 
