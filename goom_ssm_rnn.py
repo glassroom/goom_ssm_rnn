@@ -65,8 +65,9 @@ class SSMoverGOOMs(nn.Module):
     where u_t, x_t, and y_t are input, hidden, and output state vectors,
     and A, B, C, and D are matrix parameters, via a parallel prefix scan,
     over generalized orders of magnitude (GOOMs), allowing real values to
-    fluctuate over a greater dynamic range than previously possible.
-    [Cite paper]
+    fluctuate over a greater dynamic range than previously possible as
+    proposed in "Generalized Orders of Magnitude for Scalable, Parallel,
+    High-Dynamic-Range Computation" (Heinsen and Kozachkov, 2025)
 
     Args:
         d_inp: number of input features per step
