@@ -48,7 +48,7 @@ We successfully trained this RNN model, and variants of it, on several toy tasks
 For all tasks, we instantiated the model with 512 embedding dimensions (`d_emb=512`), 16 heads per token (`n_hid=16`), 32 features per head (`d_hid=32`), and eight residual recurrent layers (`n_res=8`), for a total of 38M parameters, and trained it on a recent mid-tier Nvidia GPU, with the following hyper-parameters:
 
 | Hyper-parameter        | Value                                                        |
-|------------------------|--------------------------------------------------------------|
+| :--------------------- | :----------------------------------------------------------- |
 | Batch size             | 1000, split in micro-batches that accumulate gradients       |
 | Micro-batch size       | Largest integer factor of 1000 that fits in GPU memory       |
 | Optimizer              | `torch.optim.AdamW`                                          |
