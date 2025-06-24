@@ -45,28 +45,29 @@ The recurrent layers in the model capture sequential dependencies with an SSM ov
 
 We successfully trained this RNN model, and variants of it, on several toy tasks, including [Wikitext-103](https://huggingface.co/datasets/Salesforce/wikitext) (using the GPT-2 vocabulary), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) generation (unrolling the images into sequences of 784 pixel-tokens, and using a vocabulary size of 256 gray levels per pixel-token), and Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) classification (replacing the generative-language-modeling head with a linear classification head that predicts 10 classes from the last pixel-token hidden state), and simple Copy Memory tasks.
 
-For all tasks, we instantiated the model with 512 embedding dimensions (`d_emb=512`), 16 heads per token (`n_hid=16`), 32 features per head (`d_hid=32`), and eight residual recurrent layers (`n_res=8`), resulting in 13M to 38M parameters, and trained it on a recent mid-tier Nvidia GPU, with the following hyper-parameters:
+For all toy tasks, we instantiated the model with 512 embedding dimensions (`d_emb=512`), 16 heads per token (`n_hid=16`), 32 features per head (`d_hid=32`), and eight residual recurrent layers (`n_res=8`), resulting in 13M to 38M parameters, and trained it on a recent mid-tier Nvidia GPU, with the following hyper-parameters:
 
-| Hyper-parameter        | Value                                                        |
-| :--------------------- | :----------------------------------------------------------- |
-| Batch size             | 1000, split in micro-batches that accumulate gradients       |
-| Micro-batch size       | Largest integer factor of 1000 that fits in GPU memory       |
-| Optimizer              | `torch.optim.AdamW`                                          |
-| Weight decay           | 1e-1                                                         |
-| Parameter groups       | 2, obtained with `model.get_param_groups(weight_decay=1e-1)` |
-| Learning rate schedule | `torch.optim.lr_scheduler.OneCycleLR`                        |
-| Maximum learning rate  | 3e-4                                                         |
-| Ending learning rate   | 1e-5                                                         |
-| Maximum momentum       | 0.99                                                         |
-| Minimum momentum       | 0.85                                                         |
-| Warm-up period         | 10 batches (10,000 samples)                                  |
-| Compilation            | Yes (applies only to operations on float tensors, not GOOMs) |
-| Autocasting            | Yes, to `torch.float16` (only float tensors, not GOOMs)      |
-| Number of epochs       | Varies by task                                               |
+| Hyper-parameter        | Value                                                            |
+| :--------------------- | :--------------------------------------------------------------- |
+| Batch size             | 1000, split in micro-batches that accumulate gradients           |
+| Micro-batch size       | Largest integer factor of 1000 that fits in GPU memory           |
+| Optimizer              | `torch.optim.AdamW`                                              |
+| Weight decay           | 1e-1                                                             |
+| Parameter groups       | 2, obtained with `model.get_param_groups(weight_decay=1e-1)`     |
+| Learning rate schedule | `torch.optim.lr_scheduler.OneCycleLR`                            |
+| Maximum learning rate  | 3e-4                                                             |
+| Ending learning rate   | 1e-5                                                             |
+| Maximum momentum       | 0.99                                                             |
+| Minimum momentum       | 0.85                                                             |
+| Warm-up period         | 10 batches (10,000 samples)                                      |
+| Compilation            | Yes (applies only to operations on float tensors, not GOOMs)     |
+| Autocasting            | Yes, to `torch.float16` (only float tensors, not GOOMs)          |
+| Data augmentation      | Yes, conventional (_e.g._, affine transforms on training images) |
+| Training iterations    | At least 1,800 (1.8M samples); harder tasks require more samples |
 
 The model, in all variants we tried, trains to competitive performance on all toy tasks we tested.
 
-Out of curiosity, we also partially trained a larger RNN (`d_emb=768`, `n_hid=24`, `d_hid=32`, `n_res=24`; 124M parameters) on approximately 10B tokens randomly sampled from [The Pile](https://huggingface.co/datasets/monology/pile-uncopyrighted), with a sequence length of 1024 tokens, using the GPT-2 vocabulary, and saw cross-entropy loss decline to approximately 2.7. State-of-the-art cross-entropy for models of comparable size, trained on at least 30x more tokens from better datasets, is approximately 2.4. This partial experiment suggests our RNN model can be scaled up to non-toy tasks.
+Out of curiosity, we also partially trained a larger RNN (`d_emb=768`, `n_hid=24`, `d_hid=32`, `n_res=24`; 124M parameters) on approximately 10B tokens randomly sampled from [The Pile](https://huggingface.co/datasets/monology/pile-uncopyrighted), with a sequence length of 1024 tokens, using the GPT-2 vocabulary, and saw cross-entropy loss decline to approximately 2.7. State-of-the-art cross-entropy for models of comparable size, with a similar vocabulary, trained on 30x or more tokens sampled from higher-quality datasets, is approximately 2.4. This partial experiment suggests our RNN model can be scaled up to non-toy tasks.
 
 
 ## Convenience Methods
