@@ -77,7 +77,7 @@ Besides the standard PyTorch `forward()` method, the model provides three additi
 
 * `model.compute_loss_and_metrics()`, which accepts predicted scores over the model's vocabulary, and true token ids, and returns a cross-entropy loss and a dictionary with one metric: 'accuracy'.
 
-* `model.generate()`, for generating token ids after the model has been trained on a language generation task.
+* `model.generate()`, for generating new token, given a sequence of preceding token ids, after the model has been trained on a language generation task. Please see the method's definition for additional arguments.
 
 
 ## Modifying the RNN for Other Tasks
