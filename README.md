@@ -82,9 +82,7 @@ Besides the standard PyTorch `forward()` method, the model provides three additi
 
 ## Modifying the RNN for Other Tasks
 
-You can modify or replace the model's embedding layer and/or head, as needed, for tasks other than generative language model.
-
-All model components are defined in a single file:
+You can modify or replace the model's embedding layer and/or head, as needed, for tasks other than generative language model. All model components are defined in a single file:
 
 [goom_ssm_rrn.py](goom_ssm_rrn.py)
 
