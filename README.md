@@ -51,17 +51,10 @@ For all toy tasks, we instantiated the model with 512 embedding dimensions (`d_e
 | :--------------------- | :--------------------------------------------------------------- |
 | Batch size             | 1000, split in micro-batches that accumulate gradients           |
 | Micro-batch size       | Largest integer factor of 1000 that fits in GPU memory           |
-<<<<<<< HEAD
-| Optimizer              | `torch.optim.AdamW`                                              |
-| Weight decay           | 1e-1                                                             |
-| Parameter groups       | 2, obtained with `model.get_param_groups(weight_decay=1e-1)`     |
-| Learning rate schedule | `torch.optim.lr_scheduler.OneCycleLR`                            |
-=======
 | Optimizer              | AdamW, using `torch.optim.AdamW`                                 |
 | Weight decay           | 1e-1                                                             |
 | Parameter groups       | 2, obtained with `model.get_param_groups(weight_decay=1e-1)`     |
 | Learning rate schedule | One cycle, using `torch.optim.lr_scheduler.OneCycleLR`           |
->>>>>>> aea1b44 (Update README.md)
 | Maximum learning rate  | 3e-4                                                             |
 | Ending learning rate   | 1e-5                                                             |
 | Maximum momentum       | 0.99                                                             |
@@ -74,11 +67,7 @@ For all toy tasks, we instantiated the model with 512 embedding dimensions (`d_e
 
 The model, in all variants we tried, trains to competitive performance on all toy tasks we tested.
 
-<<<<<<< HEAD
-Out of curiosity, we also partially trained a larger RNN (`d_emb=768`, `n_hid=24`, `d_hid=32`, `n_res=24`; 124M parameters) on approximately 10B tokens randomly sampled from [The Pile](https://huggingface.co/datasets/monology/pile-uncopyrighted), with a sequence length of 1024 tokens, using the GPT-2 vocabulary, and saw cross-entropy loss decline to approximately 2.7. State-of-the-art cross-entropy for models of comparable size, with a similar vocabulary, trained on 30x or more tokens sampled from higher-quality datasets, is approximately 2.4. This partial experiment suggests our RNN model can be scaled up to non-toy tasks.
-=======
 Out of curiosity, we also partially trained a larger instance of the RNN (`d_emb=768`, `n_hid=24`, `d_hid=32`, `n_res=24`, GPT-2 vocabulary, 124M parameters) on approximately 10B tokens randomly sampled from [The Pile](https://huggingface.co/datasets/monology/pile-uncopyrighted), with a sequence length of 1024 tokens, and saw cross-entropy loss decline to approximately 2.7. State-of-the-art cross-entropy for models of comparable size, with a similar vocabulary, trained on 30x or more tokens sampled from higher-quality datasets, is approximately 2.4. This partial experiment suggests our RNN model can be scaled up to non-toy tasks.
->>>>>>> aea1b44 (Update README.md)
 
 
 ## Convenience Methods
