@@ -40,7 +40,7 @@ model.to(device=DEVICE)
 
 Recurrent layers in the model capture sequential dependencies with a non-diagonal linear SSM, executed via a parallel prefix scan, over [GOOMs](https://github.com/glassroom/generalized_orders_of_magnitude), which are represented as torch.complex64 tensors (_i.e._, with torch.float32 real and imaginary components). As we explain in our paper, the use of complex-typed GOOMs makes it possible for us to allow recurrent states in each layer to fluctuate freely over a greater dynamic range of values than possible with torch.float32 or torch.float64, without numerical degradation, including in training.
 
-Otherwise, the rest of the model operates conventionally, over torch.float32 tensors, optionally with autocasting to torch.float16, if you specify it. As we explain in our paper, each recurrent layer scales complex-typed GOOMs before exponentiating them to torch.float32 real tensors, because GOOM magnitudes can be be outside the bounds representable by torch.float32.
+Otherwise, the rest of the model operates conventionally, over torch.float32 tensors, optionally with autocasting to torch.float16, if you specify it. As we explain in our paper, each recurrent layer scales complex-typed GOOMs before exponentiating them to torch.float32 real tensors, because GOOM magnitudes can be outside the bounds representable by torch.float32.
 
 
 ## Training and Testing the Model
