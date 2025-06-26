@@ -1,6 +1,6 @@
 # goom_ssm_rnn
 
-Reference implementation of a deep RNN that captures dependencies with a non-diagonal state-space model (SSM), executable in parallel via a prefix scan, over [generalized orders of magnitude](https://github.com/glassroom/generalized_orders_of_magnitude) (GOOMs), allowing recurrent states to fluctuate freely over a greater dynamic range of real values than previously possible.
+Reference implementation of a deep RNN that captures dependencies with a non-diagonal linear state-space model (SSM), executable in parallel via a prefix scan, over [generalized orders of magnitude](https://github.com/glassroom/generalized_orders_of_magnitude) (GOOMs), allowing recurrent states to fluctuate freely over a greater dynamic range of real values than previously possible.
 
 
 ## Installing
@@ -36,9 +36,9 @@ model.to(device=DEVICE)
 # You must provide your own training code.
 ```
 
-We have implemented the model as a standard PyTorch `nn.Module` that you can train and test on any task, using conventional techniques, including autocasting. However, at present the model can be only partially compiled, because PyTorch's compiler doesn't yet fully support complex tensors. When we apply `torch.compile()` to the entire model and start training it, lazy compilation spits out a long list of warnings related to the use of complex tensors, but compilation succeeds -- and significantly reduces execution time and memory use.
+We have implemented the model as a standard PyTorch `nn.Module` that you can train and test on any task, using conventional techniques, including autocasting. However, at present the model can be only partially compiled, because PyTorch's compiler doesn't yet fully support complex tensors. When we apply `torch.compile()` to the entire model and start training it, lazy compilation spits out a variety of warnings related to the use of complex tensors, but compilation succeeds -- and significantly reduces execution time and memory use.
 
-The recurrent layers in the model capture sequential dependencies with an SSM over GOOMs, which are represented as torch.complex64 tensors. As we explain in our paper, the model's use of complex-typed GOOMs makes it possible for recurrent states in each layer to fluctuate freely over a greater dynamic range of values that would be possible with torch.float32 or torch.float64, without numerical degradation. Each recurrent layer scales complex-typed GOOMs, before exponentiating them to real values, represented by float tensors.
+Recurrent layers in the model capture sequential dependencies with an SSM over GOOMs, which are represented as torch.complex64 tensors. As we explain in our paper, the model's use of complex-typed GOOMs makes it possible for recurrent states in each layer to fluctuate freely over a greater dynamic range of values than possible with torch.float32 or torch.float64, without numerical degradation. Each recurrent layer scales complex-typed GOOMs, before exponentiating them to float tensors.
 
 
 ## Replicating Published Results
@@ -65,7 +65,7 @@ For all toy tasks, we instantiated the model with 512 embedding dimensions (`d_e
 | Data augmentation      | Yes, conventional (_e.g._, affine transforms on training images) |
 | Training iterations    | At least 1,800 (1.8M samples); harder tasks require more samples |
 
-The model, in all variants we tried, trains to competitive performance on all toy tasks we tested.
+The model, in all variants we tried, trained to competitive performance on all toy tasks we tested.
 
 Out of curiosity, we also partially trained a larger instance of the RNN (`d_emb=768`, `n_hid=24`, `d_hid=32`, `n_res=24`, GPT-2 vocabulary, 124M parameters) on approximately 10B tokens randomly sampled from [The Pile](https://huggingface.co/datasets/monology/pile-uncopyrighted), with a sequence length of 1024 tokens, and saw cross-entropy loss decline to approximately 2.7. State-of-the-art cross-entropy for models of comparable size, with a similar vocabulary, trained on 30x or more tokens sampled from higher-quality datasets, is approximately 2.4. This partial experiment suggests our RNN model can be scaled up to non-toy tasks.
 
