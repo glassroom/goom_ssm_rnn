@@ -26,9 +26,9 @@ DEVICE = 'cuda'  # change as needed
 # Get GPT-2 encoder:
 enc = tiktoken.get_encoding('gpt2')
 
-# Instantiate an RNN for generative language model with GPT-2 token ids:
+# Instantiate an RNN for natural language generation:
 model = goom_ssm_rnn.GenerativeRNN(
-    vocab_sz=enc.n_vocab, d_emb=512, n_hid=16, d_hid=32, n_res=8)
+    vocab_sz=enc.n_vocab, d_emb=768, n_hid=24, d_hid=32, n_res=24)
 
 # Move model to cuda device:
 model.to(device=DEVICE)
@@ -38,9 +38,9 @@ model.to(device=DEVICE)
 
 ## Use of Complex-Typed GOOMs
 
-Recurrent layers in the model capture sequential dependencies with a non-diagonal linear SSM, executed via a parallel prefix scan, over [GOOMs](https://github.com/glassroom/generalized_orders_of_magnitude), which are represented as torch.complex64 tensors (_i.e._, with torch.float32 real and imaginary components). As we explain in our paper, the use of complex-typed GOOMs makes it possible for us to allow recurrent states in each layer to fluctuate freely over a greater dynamic range of values than possible with torch.float32 or torch.float64, without numerical degradation, including in training.
+Recurrent layers in the model capture sequential dependencies with a non-diagonal linear SSM, executed via a parallel prefix scan, over [GOOMs](https://github.com/glassroom/generalized_orders_of_magnitude), which are represented as torch.complex64 tensors (_i.e._, with torch.float32 real and imaginary components). As we explain in our paper, the use of complex-typed GOOMs makes it possible for us to allow recurrent states in each layer to fluctuate freely over a greater dynamic range of values than previously possible, without requiring any form of stabilization.
 
-Otherwise, the rest of the model operates conventionally, over torch.float32 tensors, optionally with autocasting to torch.float16, if you specify it. As we explain in our paper, each recurrent layer scales complex-typed GOOMs before exponentiating them to torch.float32 real tensors, because GOOM magnitudes can be outside the bounds representable by torch.float32.
+Otherwise, the rest of the model operates conventionally, over torch.float32 tensors, optionally autocasting to torch.float16, if you specify it. As we explain in our paper, each recurrent layer scales complex-typed GOOMs before exponentiating them to torch.float32 real tensors, because GOOM magnitudes can be outside the bounds representable by torch.float32.
 
 
 ## Training and Testing the Model
@@ -54,9 +54,37 @@ Note: We have tested autocasting of float tensors only to torch.float16.
 
 ## Replicating Published Results
 
-We successfully trained the RNN model in this repository on several toy tasks, including [Wikitext-103](https://huggingface.co/datasets/Salesforce/wikitext) (using the GPT-2 vocabulary), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) generation (unrolling the images into sequences of 784 pixel-tokens, and using a vocabulary size of 256 gray levels), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) classification (replacing the generative-language-modeling head with a linear-classification head that predicts 10 classes from the last pixel-token's hidden state), and simple Copy-Memory tasks.
+We trained the RNN model in this repository on natural language generation and multiple other tasks.
 
-For all toy tasks, we instantiated the model with 512 embedding dimensions (`d_emb=512`), 16 heads per token (`n_hid=16`), 32 features per head (`d_hid=32`), and eight residual recurrent layers (`n_res=8`), resulting in 13M to 38M parameters, and trained it on a recent mid-tier Nvidia GPU, with the following hyper-parameters:
+
+### Natural Language Generation
+
+We trained an instance of the RNN with 768 embedding dimensions (`d_emb=768`), 24 heads per token (`n_hid=24`), 32 features per head (`d_hid=32`), 24 recurrent residual layers (`n_res=24`), and GPT-2 vocabulary, resulting in 124M parameters, on approximately 10B tokens randomly sampled from [The Pile](https://huggingface.co/datasets/monology/pile-uncopyrighted), with a sequence length of 1024 tokens. We trained the RNN with the following hyper-parameters:
+
+| Hyper-parameter        | Value                                                            |
+| :--------------------- | :--------------------------------------------------------------- |
+| Batch size             | 960 sequences, split in micro-batches that accumulate gradients  |
+| Micro-batch size       | Largest integer factor of 1000 that fits in GPU memory           |
+| Optimizer              | AdamW, using `torch.optim.AdamW`                                 |
+| Weight decay           | 1e-1                                                             |
+| Parameter groups       | 2, obtained with `model.get_param_groups(weight_decay=1e-1)`     |
+| Learning rate schedule | One cycle, using `torch.optim.lr_scheduler.OneCycleLR`           |
+| Maximum learning rate  | 3e-4                                                             |
+| Ending learning rate   | 1e-5                                                             |
+| Maximum momentum       | 0.99                                                             |
+| Minimum momentum       | 0.85                                                             |
+| Warm-up period         | 10 batches (10,000 samples)                                      |
+| Compilation            | Yes (applies only to operations on float tensors, not GOOMs)     |
+| Autocasting            | Yes, to `torch.float16` (only float tensors, not GOOMs)          |
+| Training iterations    | 10240 batches                                                    |
+| Cumulative tokens      | 10B (1024 tokens/seq x 960 seqs/batch x 10240 batches)           |
+
+Cross-entropy loss declined to approximately 2.7 after 10B tokens. State-of-the-art cross-entropy for models of comparable size, with a similar vocabulary, trained on 30x or more tokens sampled from higher-quality datasets, is approximately 2.4, suggesting our RNN model can be scaled up to larger tasks. 
+
+
+### Other Tasks
+
+For all other tasks, we instantiated the RNN with 512 embedding dimensions (`d_emb=512`), 16 heads per token (`n_hid=16`), 32 features per head (`d_hid=32`), eight residual recurrent layers (`n_res=8`), a task-specific vocabulary, and a task-specific model head, resulting in 13M to 38M parameters. The other tasks include [Wikitext-103](https://huggingface.co/datasets/Salesforce/wikitext) (using the GPT-2 vocabulary), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) generation (unrolling the images into sequences of 784 pixel-tokens, and using a vocabulary size of 256 gray levels), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) classification (replacing the generative-language-modeling head with a linear-classification head that predicts 10 classes from the last pixel-token's hidden state), and Copy-Memory tasks. We trained the models with the following hyper-parameters:
 
 | Hyper-parameter        | Value                                                            |
 | :--------------------- | :--------------------------------------------------------------- |
@@ -77,8 +105,6 @@ For all toy tasks, we instantiated the model with 512 embedding dimensions (`d_e
 | Training iterations    | At least 1,800 (1.8M samples); harder tasks require more samples |
 
 The RNN trained to competitive performance on all toy tasks we tested.
-
-Out of curiosity, we also partially trained a larger instance of the RNN (`d_emb=768`, `n_hid=24`, `d_hid=32`, `n_res=24`, GPT-2 vocabulary, 124M parameters) on approximately 10B tokens randomly sampled from [The Pile](https://huggingface.co/datasets/monology/pile-uncopyrighted), with a sequence length of 1024 tokens, and saw cross-entropy loss decline to approximately 2.7. State-of-the-art cross-entropy for models of comparable size, with a similar vocabulary, trained on 30x or more tokens sampled from higher-quality datasets, is approximately 2.4. This partial experiment suggests our RNN model can be scaled up to non-toy tasks.
 
 
 ## Convenience Methods
