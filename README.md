@@ -84,7 +84,7 @@ Cross-entropy loss declined to approximately 2.7 after 10B tokens. State-of-the-
 
 ### Other Tasks
 
-For all other tasks, we instantiated the RNN with 512 embedding dimensions (`d_emb=512`), 16 heads per token (`n_hid=16`), 32 features per head (`d_hid=32`), eight residual recurrent layers (`n_res=8`), a task-specific vocabulary, and a task-specific model head, resulting in 13M to 38M parameters. The other tasks include [Wikitext-103](https://huggingface.co/datasets/Salesforce/wikitext) (using the GPT-2 vocabulary), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) generation (unrolling the images into sequences of 784 pixel-tokens, and using a vocabulary size of 256 gray levels), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) classification (replacing the generative-language-modeling head with a linear-classification head that predicts 10 classes from the last pixel-token's hidden state), and Copy-Memory tasks. We trained the models with the following hyper-parameters:
+Other tasks include, Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) generation (unrolling the images into sequences of 784 pixel-tokens, and using a vocabulary size of 256 gray levels), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) classification (replacing the generative-language-modeling head with a linear-classification head that predicts 10 classes from the last pixel-token's hidden state),  [Wikitext-103](https://huggingface.co/datasets/Salesforce/wikitext) (using the GPT-2 vocabulary), and Copy-Memory tasks.  For all such tasks, we instantiated the RNN with 512 embedding dimensions (`d_emb=512`), 16 heads per token (`n_hid=16`), 32 features per head (`d_hid=32`), eight residual recurrent layers (`n_res=8`), a task-specific vocabulary, and a task-specific model head, resulting in 12.8M to 38M parameters. We trained all models with the following hyper-parameters:
 
 | Hyper-parameter        | Value                                                            |
 | :--------------------- | :--------------------------------------------------------------- |
@@ -104,7 +104,7 @@ For all other tasks, we instantiated the RNN with 512 embedding dimensions (`d_e
 | Data augmentation      | Yes, conventional (_e.g._, affine transforms on training images) |
 | Training iterations    | At least 1,800 (1.8M samples); harder tasks require more samples |
 
-The RNN trained to competitive performance on all toy tasks we tested.
+The models trained to competitive performance on all tasks we tested.
 
 
 ## Convenience Methods
