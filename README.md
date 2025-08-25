@@ -1,6 +1,6 @@
 # goom_ssm_rnn
 
-Reference implementation of a deep RNN that captures dependencies with a non-diagonal linear state-space model (SSM), executable in parallel via a prefix scan, over [generalized orders of magnitude](https://github.com/glassroom/generalized_orders_of_magnitude) (GOOMs), allowing recurrent states to fluctuate freely over a greater dynamic range of real values than previously possible.
+Reference implementation of a deep RNN that captures dependencies with a non-diagonal linear state-space model (SSM) over [generalized orders of magnitude](https://github.com/glassroom/generalized_orders_of_magnitude) (GOOMs), allowing recurrent states to fluctuate freely over a greater dynamic range of real values than previously possible, enabling computation of _non-diagonal recurrences in parallel, via a prefix scan, without any form of stabilization_.
 
 
 ## Installing
