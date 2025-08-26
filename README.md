@@ -43,6 +43,17 @@ Recurrent layers in the model capture sequential dependencies with a non-diagona
 Otherwise, the rest of the model operates conventionally, over torch.float32 tensors, optionally autocasting to torch.float16, if you specify it. As we explain in our paper, each recurrent layer scales complex-typed GOOMs before exponentiating them to torch.float32 real tensors, because GOOM magnitudes can be outside the bounds representable by torch.float32.
 
 
+## Convenience Methods
+
+Besides the standard PyTorch `forward()` method, the model provides three additional methods, for convenience:
+
+* `model.get_param_groups()`, which accepts a scalar weight_decay value as input, and returns two parameter groups for training, one with weight decay and one without without decay.
+
+* `model.compute_loss_and_metrics()`, which accepts predicted scores over the model's vocabulary, and true token ids, and returns a cross-entropy loss and a dictionary with one metric: 'accuracy'.
+
+* `model.generate()`, for generating new token ids, given a sequence of preceding token ids, after the model has been trained on a language-generation task. Please see our code for additional arguments.
+
+
 ## Training and Testing the Model
 
 We have implemented the model as a standard PyTorch `nn.Module` that you can train and test on any task, using conventional techniques, including autocasting. However, at present the model can be only partially compiled, because PyTorch's compiler doesn't yet fully support complex tensors. For information on the current state of PyTorch's support for complex tensors, please see [this page on the PyTorch website](https://docs.pytorch.org/docs/stable/complex_numbers.html).
@@ -105,17 +116,6 @@ Other tasks include, Sequential [MNIST](https://huggingface.co/datasets/ylecun/m
 | Training iterations    | At least 1,800 (1.8M samples); harder tasks require more samples |
 
 The models trained to competitive performance on all tasks we tested.
-
-
-## Convenience Methods
-
-Besides the standard PyTorch `forward()` method, the model provides three additional methods:
-
-* `model.get_param_groups()`, which accepts a scalar weight_decay value as input, and returns two parameter groups for training, one with weight decay and one without without decay.
-
-* `model.compute_loss_and_metrics()`, which accepts predicted scores over the model's vocabulary, and true token ids, and returns a cross-entropy loss and a dictionary with one metric: 'accuracy'.
-
-* `model.generate()`, for generating new token ids, given a sequence of preceding token ids, after the model has been trained on a language-generation task. Please see our code for additional arguments.
 
 
 ## Modifying the RNN for Other Tasks
