@@ -84,11 +84,11 @@ We trained an instance of the RNN with 768 embedding dimensions (`d_emb=768`), 2
 | Ending learning rate   | 1e-5                                                             |
 | Maximum momentum       | 0.99                                                             |
 | Minimum momentum       | 0.85                                                             |
-| Warm-up period         | 10 batches (10,000 samples)                                      |
+| Warm-up period         | 10 batches (9600 sample sequences)                               |
 | Compilation            | Yes (applies only to operations on float tensors, not GOOMs)     |
 | Autocasting            | Yes, to `torch.float16` (only float tensors, not GOOMs)          |
 | Training iterations    | 10240 batches                                                    |
-| Cumulative tokens      | 10B (1024 tokens/seq x 960 seqs/batch x 10240 batches)           |
+| Cumulative tokens      | 10B (1024 tokens/sequence x 960 sequences/batch x 10240 batches) |
 
 Cross-entropy loss declined to approximately 2.7 after 10B tokens. State-of-the-art cross-entropy for models of comparable size, with a similar vocabulary, trained on 30x or more tokens sampled from higher-quality datasets, is approximately 2.4, suggesting our RNN model can be scaled up to larger tasks. 
 
