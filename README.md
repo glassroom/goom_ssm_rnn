@@ -70,7 +70,7 @@ We trained the RNN model in this repository on natural language generation and m
 
 ### Natural Language Generation
 
-We trained an instance of the RNN with 768 embedding dimensions (`d_emb=768`), 24 heads per token (`n_hid=24`), 32 features per head (`d_hid=32`), 24 recurrent residual layers (`n_res=24`), and GPT-2 vocabulary, resulting in 124M parameters, on approximately 10B tokens randomly sampled from [The Pile](https://huggingface.co/datasets/monology/pile-uncopyrighted), with a sequence length of 1024 tokens. We trained the RNN with the following hyper-parameters:
+We trained an instance of the RNN with 768 embedding dimensions (`d_emb=768`), 24 heads per token (`n_hid=24`), 32 features per head (`d_hid=32`), 24 recurrent residual layers (`n_res=24`), and GPT-2 vocabulary, resulting in 124M parameters, on approximately 10B tokens randomly sampled from [The Pile](https://huggingface.co/datasets/monology/pile-uncopyrighted), with a sequence length of 1024 tokens. We trained the RNN with the hyper-parameters shown on the table below. Cross-entropy loss declined to approximately 2.7 after training on 10B tokens. For comparison, cross-entropy for state-of-the-art models of comparable size, trained on 30x or more tokens sampled from higher-quality datasets, is approximately 2.4, suggesting our RNN model can be scaled up to larger tasks.
 
 | Hyper-parameter        | Value                                                            |
 | :--------------------- | :--------------------------------------------------------------- |
@@ -90,14 +90,10 @@ We trained an instance of the RNN with 768 embedding dimensions (`d_emb=768`), 2
 | Training iterations    | 10240 batches                                                    |
 | Cumulative tokens      | 10B (1024 tokens/sequence x 960 sequences/batch x 10240 batches) |
 
-#### Performance on Natural Language Generation
-
-Cross-entropy loss declined to approximately 2.7 after training on 10B tokens. For comparison, cross-entropy for state-of-the-art models of comparable size, with a similar vocabulary, trained on 30x or more tokens sampled from higher-quality datasets, is approximately 2.4, suggesting our RNN model can be scaled up to larger tasks. 
-
 
 ### Other Tasks
 
-Other tasks include Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) generation (unrolling the images into sequences of 784 pixel-tokens, using a vocabulary size of 256 gray levels, and generating each next pixel), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) classification (replacing the generative-language-modeling head with a linear-classification head that predicts 10 classes from the last pixel-token's hidden state),  [Wikitext-103](https://huggingface.co/datasets/Salesforce/wikitext) (using the GPT-2 vocabulary for convenience), and Copy-Memory tasks.  For all such tasks, we instantiated the RNN with 512 embedding dimensions (`d_emb=512`), 16 heads per token (`n_hid=16`), 32 features per head (`d_hid=32`), eight residual recurrent layers (`n_res=8`), a task-specific vocabulary, and a task-specific model head, resulting in 12.8M to 38M parameters. We trained all models with the following hyper-parameters:
+Other tasks include Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) generation (unrolling the images into sequences of 784 pixel-tokens, using a vocabulary size of 256 gray levels, and generating each next pixel), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) classification (replacing the generative-language-modeling head with a linear-classification head that predicts 10 classes from the last pixel-token's hidden state),  [Wikitext-103](https://huggingface.co/datasets/Salesforce/wikitext) (using the GPT-2 vocabulary for convenience), and Copy-Memory tasks.  For all such tasks, we instantiated the RNN with 512 embedding dimensions (`d_emb=512`), 16 heads per token (`n_hid=16`), 32 features per head (`d_hid=32`), eight residual recurrent layers (`n_res=8`), a task-specific vocabulary, and a task-specific model head, resulting in 12.8M to 38M parameters. We trained all models with the hyper-parameters shown on the table below. The models trained to competitive performance on all tasks we tested.
 
 | Hyper-parameter        | Value                                                            |
 | :--------------------- | :--------------------------------------------------------------- |
@@ -116,10 +112,6 @@ Other tasks include Sequential [MNIST](https://huggingface.co/datasets/ylecun/mn
 | Autocasting            | Yes, to `torch.float16` (only floats, not complex GOOMs)         |
 | Data augmentation      | Yes, conventional (_e.g._, affine transforms on training images) |
 | Training iterations    | At least 1,800 (1.8M samples); harder tasks require more samples |
-
-#### Performance on Other Tasks
-
-The models trained to competitive performance on all tasks we tested.
 
 
 ## Modifying the RNN for Other Tasks
