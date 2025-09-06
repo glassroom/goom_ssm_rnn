@@ -1,6 +1,6 @@
 # goom_ssm_rnn
 
-Reference implementation of a deep RNN that captures dependencies with a non-diagonal linear state-space model (SSM) over [generalized orders of magnitude](https://github.com/glassroom/generalized_orders_of_magnitude) (GOOMs), allowing recurrent states to fluctuate freely over a greater dynamic range of real values than previously possible, enabling computation of _non-diagonal recurrences in parallel, via a prefix scan, without any form of stabilization_.
+Reference implementation of a deep RNN that captures dependencies with a non-diagonal linear state-space model (SSM) over our implementation of [generalized orders of magnitude](https://github.com/glassroom/generalized_orders_of_magnitude) (GOOMs), allowing recurrent states to fluctuate freely over a greater dynamic range of real values than previously possible, enabling computation of _non-diagonal recurrences in parallel, via a prefix scan, without any form of stabilization_.
 
 
 ## Installing
@@ -38,9 +38,9 @@ model.to(device=DEVICE)
 
 ## Use of Complex-Typed GOOMs
 
-Recurrent layers in the model capture sequential dependencies with a non-diagonal linear SSM, executed via a parallel prefix scan, over [GOOMs](https://github.com/glassroom/generalized_orders_of_magnitude), which are represented as torch.complex64 tensors (_i.e._, with torch.float32 real and imaginary components). As we explain in our paper, the use of complex-typed GOOMs makes it possible for us to allow recurrent states in each layer to fluctuate freely over a greater dynamic range of values than previously possible, without requiring any form of stabilization.
+Recurrent layers in the model capture sequential dependencies with a non-diagonal linear SSM, executed via a parallel prefix scan, over [GOOMs](https://github.com/glassroom/generalized_orders_of_magnitude), implemented as torch.complex64 tensors (_i.e._, with torch.float32 real and imaginary components). As we explain in our paper, the use of complex-typed GOOMs makes it possible for each layer to compute _non-diagonal recurrent states in parallel without requiring any form of stabilization_.
 
-Otherwise, the rest of the model operates conventionally, over torch.float32 tensors, optionally autocasting to torch.float16, if you specify it. As we explain in our paper, each recurrent layer scales complex-typed GOOMs before exponentiating them to torch.float32 real tensors, because GOOM magnitudes can be outside the bounds representable by torch.float32.
+Otherwise, the rest of the model operates conventionally, over torch.float32 tensors, optionally autocasting to torch.float16, if you specify it. As we explain in our paper, each recurrent layer scales complex-typed GOOMs before exponentiating them to torch.float32 real tensors, because the GOOM magnitudes can be outside bounds representable by torch.float32.
 
 
 ## Convenience Methods
@@ -85,17 +85,19 @@ We trained an instance of the RNN with 768 embedding dimensions (`d_emb=768`), 2
 | Maximum momentum       | 0.99                                                             |
 | Minimum momentum       | 0.85                                                             |
 | Warm-up period         | 10 batches (9600 sample sequences)                               |
-| Compilation            | Yes (applies only to operations on float tensors, not GOOMs)     |
-| Autocasting            | Yes, to `torch.float16` (only float tensors, not GOOMs)          |
+| Compilation            | Yes (applies only to operations on floats, not complex GOOMs)    |
+| Autocasting            | Yes, to `torch.float16` (only floats, not complex GOOMs)         |
 | Training iterations    | 10240 batches                                                    |
 | Cumulative tokens      | 10B (1024 tokens/sequence x 960 sequences/batch x 10240 batches) |
 
-Cross-entropy loss declined to approximately 2.7 after 10B tokens. State-of-the-art cross-entropy for models of comparable size, with a similar vocabulary, trained on 30x or more tokens sampled from higher-quality datasets, is approximately 2.4, suggesting our RNN model can be scaled up to larger tasks. 
+#### Performance on Natural Language Generation
+
+Cross-entropy loss declined to approximately 2.7 after training on 10B tokens. For comparison, cross-entropy for state-of-the-art models of comparable size, with a similar vocabulary, trained on 30x or more tokens sampled from higher-quality datasets, is approximately 2.4, suggesting our RNN model can be scaled up to larger tasks. 
 
 
 ### Other Tasks
 
-Other tasks include, Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) generation (unrolling the images into sequences of 784 pixel-tokens, and using a vocabulary size of 256 gray levels), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) classification (replacing the generative-language-modeling head with a linear-classification head that predicts 10 classes from the last pixel-token's hidden state),  [Wikitext-103](https://huggingface.co/datasets/Salesforce/wikitext) (using the GPT-2 vocabulary), and Copy-Memory tasks.  For all such tasks, we instantiated the RNN with 512 embedding dimensions (`d_emb=512`), 16 heads per token (`n_hid=16`), 32 features per head (`d_hid=32`), eight residual recurrent layers (`n_res=8`), a task-specific vocabulary, and a task-specific model head, resulting in 12.8M to 38M parameters. We trained all models with the following hyper-parameters:
+Other tasks include Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) generation (unrolling the images into sequences of 784 pixel-tokens, using a vocabulary size of 256 gray levels, and generating each next pixel), Sequential [MNIST](https://huggingface.co/datasets/ylecun/mnist) classification (replacing the generative-language-modeling head with a linear-classification head that predicts 10 classes from the last pixel-token's hidden state),  [Wikitext-103](https://huggingface.co/datasets/Salesforce/wikitext) (using the GPT-2 vocabulary for convenience), and Copy-Memory tasks.  For all such tasks, we instantiated the RNN with 512 embedding dimensions (`d_emb=512`), 16 heads per token (`n_hid=16`), 32 features per head (`d_hid=32`), eight residual recurrent layers (`n_res=8`), a task-specific vocabulary, and a task-specific model head, resulting in 12.8M to 38M parameters. We trained all models with the following hyper-parameters:
 
 | Hyper-parameter        | Value                                                            |
 | :--------------------- | :--------------------------------------------------------------- |
@@ -110,10 +112,12 @@ Other tasks include, Sequential [MNIST](https://huggingface.co/datasets/ylecun/m
 | Maximum momentum       | 0.99                                                             |
 | Minimum momentum       | 0.85                                                             |
 | Warm-up period         | 10 batches (10,000 samples)                                      |
-| Compilation            | Yes (applies only to operations on float tensors, not GOOMs)     |
-| Autocasting            | Yes, to `torch.float16` (only float tensors, not GOOMs)          |
+| Compilation            | Yes (applies only to operations on floats, not complex GOOMs)    |
+| Autocasting            | Yes, to `torch.float16` (only floats, not complex GOOMs)         |
 | Data augmentation      | Yes, conventional (_e.g._, affine transforms on training images) |
 | Training iterations    | At least 1,800 (1.8M samples); harder tasks require more samples |
+
+#### Performance on Other Tasks
 
 The models trained to competitive performance on all tasks we tested.
 
