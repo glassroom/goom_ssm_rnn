@@ -123,8 +123,6 @@ You can modify or replace the model's language-modeling head, as needed, for tas
 
 ## Citing
 
-TODO: Update citation.
-
 ```
 @article{
 heinsen2025generalized,
