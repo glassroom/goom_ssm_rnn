@@ -75,7 +75,7 @@ We trained an instance of the RNN with 768 embedding dimensions (`d_emb=768`), 2
 | Hyper-parameter        | Value                                                            |
 | :--------------------- | :--------------------------------------------------------------- |
 | Batch size             | 960 sequences, split in micro-batches that accumulate gradients  |
-| Micro-batch size       | Largest integer factor of 1000 that fits in GPU memory           |
+| Micro-batch size       | Largest integer factor of 960 that fits in GPU memory            |
 | Optimizer              | AdamW, using `torch.optim.AdamW`                                 |
 | Weight decay           | 1e-1                                                             |
 | Parameter groups       | 2, obtained with `model.get_param_groups(weight_decay=1e-1)`     |
