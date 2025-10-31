@@ -4,8 +4,8 @@ Reference implementation of a deep RNN that captures sequential dependencies in 
 
 $$
 \begin{aligned}
-x_t & = A x_{t-1} + B u_t
-y_t & = C x_t + D u_t,
+x_t & = A x_{t-1} + B u_t \\
+y_t & = C x_t + D u_t, \\
 \end{aligned}
 $$
 
