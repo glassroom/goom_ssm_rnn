@@ -9,7 +9,7 @@ y_t & = C x_t + D u_t, \\
 \end{aligned}
 $$
 
-where $u_t$, $x_t$, and $y_t$ are input, hidden, and output state vectors, respectively, and $A$, $B$, $C$, and $D$ are matrix parameters. Parallel execution without stabilization is possible because we compute the recurrence over [generalized orders of magnitude](https://github.com/glassroom/generalized_orders_of_magnitude) (GOOMs).
+where $u_t$, $x_t$, and $y_t$ are input, hidden, and output state vectors, respectively, and $A$, $B$, $C$, and $D$ are matrix parameters. Parallel execution without stabilization is possible because we compute the recurrence over [generalized orders of magnitude](https://github.com/glassroom/generalized_orders_of_magnitude) (GOOMs), with greater dynamic range than previously possible.
 
 
 ## Installing
