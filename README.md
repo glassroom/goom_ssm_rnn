@@ -1,6 +1,15 @@
 # goom_ssm_rnn
 
-Reference implementation of a deep RNN that captures dependencies with a non-diagonal linear state-space model (SSM) over our implementation of [generalized orders of magnitude](https://github.com/glassroom/generalized_orders_of_magnitude) (GOOMs), allowing recurrent states to fluctuate freely over a greater dynamic range of real values than previously possible, enabling computation of _non-diagonal recurrences in parallel, via a prefix scan, without any form of stabilization_.
+Reference implementation of a deep RNN that captures sequential dependencies in every layer with the following non-diagonal state-space system, _executed in parallel via a prefix scan without any form of stabilization_:
+
+$$
+\begin{aligned}
+x_t & = A x_{t-1} + B u_t
+y_t & = C x_t + D u_t,
+\end{aligned}
+$$
+
+where $u_t$, $x_t$, and $y_t$ are input, hidden, and output state vectors, respectively, and $A$, $B$, $C$, and $D$ are matrix parameters. Parallel execution without stabilization is possible because we compute the recurrence over [generalized orders of magnitude](https://github.com/glassroom/generalized_orders_of_magnitude) (GOOMs).
 
 
 ## Installing
