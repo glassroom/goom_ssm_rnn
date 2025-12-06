@@ -1,3 +1,12 @@
+# Important Notice
+
+The code in this repository is now hosted and maintained by Dynamic Intelligence Lab, a research group at Brown University:
+
+[https://github.com/dynamic-intelligence-lab/goom_ssm_rnn](https://github.com/dynamic-intelligence-lab/goom_ssm_rnn)
+
+Please use that repository. The code here is no longer actively mantained.
+
+
 # goom_ssm_rnn
 
 Reference implementation of a deep RNN that captures sequential dependencies in every layer with the following non-diagonal state-space system, _executed in parallel via a prefix scan without any form of stabilization_:
